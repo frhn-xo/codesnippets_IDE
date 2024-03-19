@@ -7,7 +7,7 @@
   src: url('../fonts/two.woff2');
 }
 
-input:focus-visible {
+/* input:focus-visible {
   outline: none;
   border-radius: none;
-}
+} */
