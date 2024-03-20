@@ -1,7 +1,16 @@
 import mysql from 'mysql2';
+import Redis from 'ioredis';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
+const redisUri = process.env.REDIS_URL;
+const redis = new Redis(redisUri);
+
+redis.set('ping', 'pong');
+redis.get('ping').then((result) => {
+  console.log('Redis: ping', result);
+});
 
 const connection = mysql.createConnection({
   host: process.env.SQL_HOST,
@@ -20,4 +29,4 @@ connection.connect((err) => {
   console.log('Connected to MySQL');
 });
 
-export { connection };
+export { connection, redis };
