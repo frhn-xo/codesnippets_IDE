@@ -25,9 +25,9 @@ const Form = () => {
   }
 
   const submitData = (data) => {
-    const sourceCode = editorRef.current.getValue();
+    const source_code = editorRef.current.getValue();
     const language = selectedLanguage;
-    data = { ...data, sourceCode, language };
+    data = { ...data, source_code, language };
     console.log(data);
   };
 
