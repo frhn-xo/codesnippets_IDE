@@ -73,11 +73,31 @@ export const checkStatus = async (token) => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       return checkStatus(token);
     } else {
-      console.log('stdout:', stdout);
-      console.log('status_id:', status_id);
-      console.log('language_id:', language_id);
-      console.log('stderr:', stderr);
-      return response.data;
+      // console.log('stdout:', stdout);
+      // console.log('status_id:', status_id);
+      // console.log('language_id:', language_id);
+      // console.log('stderr:', stderr);
+
+      let output = null;
+
+      switch (status_id) {
+        case 3:
+          console.log('Accepted');
+          output = stdout;
+          break;
+        case 5:
+          console.log('Time limit exceeded');
+          output = 'Time limit exceeded';
+          break;
+        case 6:
+          console.log('Compilation error');
+          output = 'Compilation error';
+          break;
+        default:
+          console.log(stderr);
+          output = stderr;
+      }
+      return output;
     }
   } catch (err) {
     console.error('Error checking status:', err);

@@ -22,16 +22,18 @@ export const addSnippet = async (req, res) => {
     const sanitizedStdin = stdin !== undefined ? stdin : null;
 
     const output = await submitJudge0(language, sanitizedStdin, source_code);
-    res.status(201).json(output);
 
-    // const sql = `INSERT INTO allsnippets (username, language, stdin, source_code) VALUES (?, ?, ?, ?)`;
-    // await connection
-    //   .promise()
-    //   .execute(sql, [username, language, sanitizedStdin, source_code]);
-    // res.status(201).json({
-    //   message: 'Snippet added successfully',
-    //   snippet: { username, language, stdin, source_code },
-    // });
+    console.log('output', output);
+
+    const sql = `INSERT INTO allsnippets (username, language, stdin, source_code, output) VALUES (?, ?, ?, ?, ?)`;
+    await connection
+      .promise()
+      .execute(sql, [username, language, sanitizedStdin, source_code, output]);
+
+    res.status(201).json({
+      message: 'Snippet added successfully',
+      snippet: { username, language, stdin, source_code, output },
+    });
   } catch (error) {
     console.error('Error adding snippet:', error);
     res.status(500).json({ message: 'Error adding snippet' });
