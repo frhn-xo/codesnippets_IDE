@@ -36,7 +36,7 @@ const Form = () => {
       const source_code = editorRef.current.getValue();
       const language = selectedLanguage;
       data = { ...data, source_code, language };
-      console.log(data);
+      // console.log(data);
 
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/add-snippet`,
@@ -47,10 +47,10 @@ const Form = () => {
           },
         }
       );
-      console.log(output);
+      // console.log(output);
       setOutput(res.data.snippet.output);
-      console.log(output);
-      console.log(res.data);
+      // console.log(output);
+      // console.log(res.data);
     } catch (error) {
       console.error(error);
       setIsSubmit(error);

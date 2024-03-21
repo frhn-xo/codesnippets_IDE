@@ -10,7 +10,7 @@ const Display = () => {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/get-snippets`
       );
-      console.log(res.data);
+      // console.log(res.data);
       setSnippets(res.data);
     };
     fetchSnippets();
