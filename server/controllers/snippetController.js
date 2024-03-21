@@ -19,22 +19,33 @@ export const addSnippet = async (req, res) => {
       });
     }
 
-    const sanitizedStdin = stdin !== undefined ? stdin : null;
+    const output = await submitJudge0(language, stdin, source_code);
 
-    const output = await submitJudge0(language, sanitizedStdin, source_code);
+    const timestamp = new Date();
 
     console.log('output', output);
+    const sanitizedStdin = stdin !== undefined ? stdin : null;
+    console.log('sanitizedStdin', sanitizedStdin);
 
-    const sql = `INSERT INTO allsnippets (username, language, stdin, source_code, output) VALUES (?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO allsnippets (username, language, stdin, source_code, output, timestamp) VALUES (?, ?, ?, ?, ?, ?)`;
     await connection
       .promise()
-      .execute(sql, [username, language, sanitizedStdin, source_code, output]);
+      .execute(sql, [
+        username,
+        language,
+        sanitizedStdin,
+        source_code,
+        output,
+        timestamp,
+      ]);
 
     await redis.del('snippets');
 
+    console.log(timestamp.toString(), timestamp);
+
     res.status(201).json({
       message: 'Snippet added successfully',
-      snippet: { username, language, stdin, source_code, output },
+      snippet: { username, language, stdin, source_code, output, timestamp },
     });
   } catch (error) {
     console.error('Error adding snippet:', error);
@@ -47,12 +58,13 @@ export const getSnippets = async (req, res) => {
     const cachedSnippets = await redis.get('snippets');
     if (cachedSnippets) {
       console.log('Cache hit');
-      return res.status(200).json(JSON.parse(cachedSnippets));
+      return res.status(200).json(cachedSnippets);
     } else {
-      const sql = `SELECT username, language, stdin, LEFT(source_code, 100) AS truncated_source_code, output, timestamp FROM allsnippets`;
+      const sql = `SELECT id, username, language, stdin, LEFT(source_code, 100) AS truncated_source_code, output, timestamp FROM allsnippets ORDER BY id DESC`;
       const [rows] = await connection.promise().query(sql);
 
-      await redis.set('snippets', JSON.stringify(rows), 'EX', 1800);
+      await redis.set('snippets', JSON.stringify(rows));
+      await redis.expire('snippets', 1800);
       res.status(200).json(rows);
     }
   } catch (error) {

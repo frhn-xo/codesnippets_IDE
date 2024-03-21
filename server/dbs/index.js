@@ -1,11 +1,16 @@
 import mysql from 'mysql2';
-import Redis from 'ioredis';
+// import Redis from 'ioredis';
 import dotenv from 'dotenv';
+import { Redis } from '@upstash/redis';
 
 dotenv.config();
 
-const redisUri = process.env.REDIS_URL;
-const redis = new Redis(redisUri);
+// const redis = new Redis(process.env.REDIS_URL);
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_URL,
+  token: process.env.UPSTASH_REDIS_TOKEN,
+});
 
 redis.set('ping', 'pong');
 redis.get('ping').then((result) => {

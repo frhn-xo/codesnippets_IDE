@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
-import { PageToggle } from '../components';
-import { useForm } from 'react-hook-form';
+import { PageToggle, Title } from '../components';
+import { set, useForm } from 'react-hook-form';
 import Editor from '@monaco-editor/react';
+import axios from 'axios';
 
 const Form = () => {
   const {
@@ -20,25 +21,66 @@ const Form = () => {
     setSelectedLanguage(event.target.value);
   };
 
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [output, setOutput] = useState(null);
+
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor;
   }
 
-  const submitData = (data) => {
-    const source_code = editorRef.current.getValue();
-    const language = selectedLanguage;
-    data = { ...data, source_code, language };
-    console.log(data);
+  const submitData = async (data) => {
+    try {
+      setIsSubmit(true);
+      setOutput('fetching from judge0...');
+
+      const source_code = editorRef.current.getValue();
+      const language = selectedLanguage;
+      data = { ...data, source_code, language };
+      console.log(data);
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/add-snippet`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log(output);
+      setOutput(res.data.snippet.output);
+      console.log(output);
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+      setIsSubmit(error);
+    }
   };
 
   return (
     <>
-      <div className="bg-black min-h-screen text-slate-50 font-f1 px-40 py-10 w-full font-semibold">
-        <div className="flex justify-center w-full mb-4">
-          <div className="text-lime-300 font-semibold text-6xl">
-            codeSnippets
+      {isSubmit && (
+        <div className="fixed z-50 inset-0 overflow-y-auto bg-opacity-30 backdrop-blur-md flex items-center justify-center">
+          <div className="bg-black ring-2 ring-indigo-600  h-2/3 w-2/4 sm:w-3/5 rounded-2xl flex-col">
+            <div className="flex justify-between">
+              <div className="text-slate-50 font-semibold text-3xl m-6">
+                Output
+              </div>
+              <button
+                className="bg-lime-300 text-black font-semibold rounded-sm text-3xl w-28 h-14 m-4 hover:bg-black hover:text-slate-50 ring-lime-300 ring-2"
+                onClick={() => setIsSubmit(false)}
+              >
+                Close
+              </button>
+            </div>
+            <div className="text-slate-50 h-80 mx-4 mt-5 overflow-scroll font-mono text-2xl">
+              {output}
+            </div>
           </div>
         </div>
+      )}
+      <div className="bg-black min-h-screen text-slate-50 font-f1 px-40 py-10 w-full font-semibold">
+        <Title />
         <PageToggle />
         <form
           onSubmit={handleSubmit(submitData)}
@@ -84,7 +126,7 @@ const Form = () => {
             </label>
 
             <label className="text-2xl flex-col">
-              <div className="mt-4">Source Code:</div>
+              <div className="mt-4"> Code:</div>
               <div className="ring-2 ring-indigo-600 bg-transparent p-1.5 my-3 rounded-md pt-4">
                 <Editor
                   height="400px"

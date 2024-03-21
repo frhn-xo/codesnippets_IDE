@@ -9,8 +9,8 @@ const PageToggle = () => {
           to="/form"
           className={({ isActive }) =>
             `${
-              isActive ? 'bg-lime-300 text-black font-semibold' : 'bg-black'
-            } ring-1 ring-lime-300 px-4 py-1.5 rounded-sm`
+              isActive ? 'bg-lime-300 text-black' : 'bg-black'
+            } ring-1 ring-lime-300 px-4 py-1.5 rounded-sm font-semibold`
           }
         >
           form page
@@ -19,8 +19,8 @@ const PageToggle = () => {
           to="/display"
           className={({ isActive }) =>
             `${
-              isActive ? 'bg-lime-300 text-black font-semibold' : 'bg-black'
-            } ring-1 ring-lime-300 px-4 py-1.5 rounded-sm`
+              isActive ? 'bg-lime-300 text-black ' : 'bg-black'
+            } ring-1 ring-lime-300 px-4 py-1.5 rounded-sm font-semibold`
           }
         >
           display page
